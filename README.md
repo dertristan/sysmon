@@ -26,4 +26,30 @@ Here is what it looks like in action:
 
 ### ⚙️ Usage
 
-1. Open PowerShell
+1. Open PowerShell and navigate to the folder containing the script:
+
+   ```powershell
+   cd C:\path\to\script
+   ```
+2. Run the monitor:
+
+   ```powershell
+   .\sysmon.ps1
+   ```
+3. To stop monitoring, press **Ctrl + C**.
+
+The display refreshes every **5 seconds** and updates smoothly without blinking.
+
+---
+
+### ⚠️ Experimental
+
+This project is **experimental** and may occasionally crash or display errors (especially due to Windows performance counter bugs).
+If it stops unexpectedly, just re-run it — it won’t harm your system.
+
+---
+
+### 🪪 License
+
+Released under the **MIT License** — free to use, modify, and share.
+FOSS forever ❤️
