@@ -45,11 +45,10 @@ The display refreshes every **5 seconds** and updates smoothly without blinking.
 ### ⚠️ Experimental
 
 This project is **experimental** and may occasionally crash or display errors (especially due to Windows performance counter bugs).
-If it stops unexpectedly, just re-run it — it won’t harm your system.
+If it stops unexpectedly, just re-run it.
 
 ---
 
 ### 🪪 License
 
-Released under the **MIT License** — free to use, modify, and share.
-FOSS forever ❤️
+Released under the **MIT License** — free to use, modify, and share ❤️
