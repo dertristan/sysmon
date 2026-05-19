@@ -75,6 +75,7 @@ try {
         $topCPU = $allProc | Sort-Object CPU -Descending | Select-Object -First 5
         Write-Host ""
         Write-Host "Top 5 CPU Processes:"
+        Write-Host ("  {0,-25} {1,14}  {2,11}" -f "PROCESS", "CPU TIME", "MEMORY")
         $topCPU | ForEach-Object {
             Write-Host ("  {0,-25} {1,8:N1} CPU-s  {2,8:N1} MB" -f $_.ProcessName, $_.CPU, ($_.WorkingSet / 1MB))
         }
