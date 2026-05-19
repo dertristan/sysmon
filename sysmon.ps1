@@ -32,7 +32,8 @@ function New-Bar {
 # -------------------------------------------------------------------------
 
 [Console]::CursorVisible = $false
-$cores = (Get-Counter '\Processor(*)\% Processor Time').CounterSamples | 
+Clear-Host
+$cores = (Get-Counter '\Processor(*)\% Processor Time').CounterSamples |
     Where-Object { $_.Path -notmatch "_Total" } |
     ForEach-Object { $_.InstanceName }
 
@@ -66,7 +67,7 @@ try {
         $usedMem = $totalMem - $memFree
         $memPercent = [math]::Round(($usedMem / $totalMem) * 100, 2)
         Write-Host ""
-        Write-Host ("Memory: {0,6:N2}% ({1,8:N0} MB / {2,8:N0} MB)  {3}" -f $memPercent, $usedMem, $totalMem, (New-Bar $memPercent))
+        Write-Host ("Memory: {0:N2}% ({1:N0} MB / {2:N0} MB)  {3}" -f $memPercent, $usedMem, $totalMem, (New-Bar $memPercent))
 
         # --- Top processes ------------------------------------------------
         $allProc = Get-Process
