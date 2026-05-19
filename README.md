@@ -8,7 +8,7 @@ A tiny (yet experimental) PowerShell system monitor that displays live CPU, RAM,
 
 Here is what it looks like in action:
 
-![System Monitor Screenshot](img/screenshot.png)
+<img src="img/screenshot.png" alt="System Monitor Screenshot" width="50%">
 
 ---
 
