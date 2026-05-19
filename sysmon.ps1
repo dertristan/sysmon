@@ -29,6 +29,19 @@ function New-Bar {
     
     return ($fullBlock * $filled + $lightBlock * $empty)
 }
+
+# Pad each line to terminal width so new content fully overwrites the previous frame.
+function Write-Line {
+    param(
+        [string]$Text = "",
+        $Color = $null
+    )
+    $w = [Console]::WindowWidth - 1
+    if ($Text.Length -gt $w) { $Text = $Text.Substring(0, $w) }
+    else                     { $Text = $Text.PadRight($w) }
+    if ($null -ne $Color) { Write-Host $Text -ForegroundColor $Color }
+    else                  { Write-Host $Text }
+}
 # -------------------------------------------------------------------------
 
 [Console]::CursorVisible = $false
@@ -42,7 +55,7 @@ try {
         [Console]::SetCursorPosition(0,0)
 
 	# --- CPU ----------------------------------------------------------
-	Write-Host "=== System Monitor ==="
+	Write-Line "=== System Monitor ==="
 	try {
     	    $cpuAllSample = Get-Counter '\Processor(_Total)\% Processor Time' -ErrorAction Stop
             $cpuAll = $cpuAllSample.CounterSamples.CookedValue
@@ -50,14 +63,14 @@ try {
             $cpuCoreSamples = Get-Counter ($cores | ForEach-Object { "\Processor($_)\% Processor Time" }) -ErrorAction Stop
             $cpuPerCore = $cpuCoreSamples.CounterSamples
 
-            Write-Host ("{0,-7}: {1,6:N2}%  {2}" -f "Total", $cpuAll, (New-Bar $cpuAll))
-            Write-Host ("-" * 36)
+            Write-Line ("{0,-7}: {1,6:N2}%  {2}" -f "Total", $cpuAll, (New-Bar $cpuAll))
+            Write-Line ("-" * 36)
             foreach ($c in $cpuPerCore) {
-                Write-Host ("Core {0,-2}: {1,6:N2}%  {2}" -f $c.InstanceName, $c.CookedValue, (New-Bar $c.CookedValue))
+                Write-Line ("Core {0,-2}: {1,6:N2}%  {2}" -f $c.InstanceName, $c.CookedValue, (New-Bar $c.CookedValue))
             }
 	}
 	catch {
-    	    Write-Host "CPU data unavailable (counter error)"
+    	    Write-Line "CPU data unavailable (counter error)"
 	}
 
 
@@ -66,29 +79,39 @@ try {
         $totalMem = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1MB
         $usedMem = $totalMem - $memFree
         $memPercent = [math]::Round(($usedMem / $totalMem) * 100, 2)
-        Write-Host ""
-        Write-Host ("Memory: {0:N2}% ({1:N0} MB / {2:N0} MB)  {3}" -f $memPercent, $usedMem, $totalMem, (New-Bar $memPercent))
+        Write-Line ""
+        Write-Line ("Memory: {0:N2}% ({1:N0} MB / {2:N0} MB)  {3}" -f $memPercent, $usedMem, $totalMem, (New-Bar $memPercent))
 
         # --- Top processes ------------------------------------------------
         $allProc = Get-Process
 
         $topCPU = $allProc | Sort-Object CPU -Descending | Select-Object -First 5
-        Write-Host ""
-        Write-Host "Top 5 CPU Processes:"
-        Write-Host ("  {0,-25} {1,14}  {2,11}" -f "PROCESS", "CPU TIME", "MEMORY")
+        Write-Line ""
+        Write-Line "Top 5 CPU Processes:"
+        Write-Line ("  {0,-25} {1,14}  {2,11}" -f "PROCESS", "CPU TIME", "MEMORY")
         $topCPU | ForEach-Object {
-            Write-Host ("  {0,-25} {1,8:N1} CPU-s  {2,8:N1} MB" -f $_.ProcessName, $_.CPU, ($_.WorkingSet / 1MB))
+            Write-Line ("  {0,-25} {1,8:N1} CPU-s  {2,8:N1} MB" -f $_.ProcessName, $_.CPU, ($_.WorkingSet / 1MB))
         }
 
         $topMem = $allProc | Sort-Object WorkingSet -Descending | Select-Object -First 5
-        Write-Host ""
-        Write-Host "Top 5 Memory Processes:"
+        Write-Line ""
+        Write-Line "Top 5 Memory Processes:"
         $topMem | ForEach-Object {
-            Write-Host ("  {0,-25} {1,8:N1} MB" -f $_.ProcessName, ($_.WorkingSet / 1MB))
+            Write-Line ("  {0,-25} {1,8:N1} MB" -f $_.ProcessName, ($_.WorkingSet / 1MB))
         }
 
-        Write-Host ""
-        Write-Host "Press Ctrl+C to quit" -ForegroundColor DarkGray
+        Write-Line ""
+        Write-Line "Press Ctrl+C to quit" -Color DarkGray
+
+        # Blank-pad any rows below the last line so a shorter frame leaves no leftovers.
+        $endRow = [Console]::CursorTop
+        $lastVisible = [Console]::WindowTop + [Console]::WindowHeight - 1
+        $blank = ' ' * ([Console]::WindowWidth - 1)
+        for ($r = $endRow; $r -lt $lastVisible; $r++) {
+            [Console]::SetCursorPosition(0, $r)
+            [Console]::Write($blank)
+        }
+        [Console]::SetCursorPosition(0, $endRow)
 
         Start-Sleep -Seconds $Interval
     }
