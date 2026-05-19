@@ -87,6 +87,9 @@ try {
             Write-Host ("  {0,-25} {1,8:N1} MB" -f $_.ProcessName, ($_.WorkingSet / 1MB))
         }
 
+        Write-Host ""
+        Write-Host "Press Ctrl+C to quit" -ForegroundColor DarkGray
+
         Start-Sleep -Seconds $Interval
     }
 }
